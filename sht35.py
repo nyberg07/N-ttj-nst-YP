@@ -1,14 +1,10 @@
 import time
-import gpiod
-import smbus2 
+import smbus2
 
-
-# ========== SHT35 sensorinställningar ==========
 I2C_BUS = 2                 # /dev/i2c-2
 SHT3X_ADDRESS = 0x45        # Grove SHT35 address
 CMD_SINGLE_SHOT_HIGH = (0x24, 0x00)
 
-# skript som läser datan från sht35
 def _crc8_sht(data: bytes) -> int:
     poly = 0x31
     crc = 0xFF
@@ -20,7 +16,6 @@ def _crc8_sht(data: bytes) -> int:
             else:
                 crc = (crc << 1) & 0xFF
     return crc
-
 
 def read_sht35():
     with smbus2.SMBus(I2C_BUS) as bus:
@@ -47,5 +42,19 @@ def read_sht35():
             "humidity": humidity_rh
         }
 
-print(read_sht35())
+if __name__ == "__main__":
+    with open("/home/debian/sht35.log", "a") as logfile:
+        while True:
+            try:
+                data = read_sht35()
+                log_line = f"{time.strftime('%Y-%m-%d %H:%M:%S')} Temperature: {data['temperature']:.2f} °C, Humidity: {data['humidity']:.2f} %\n"
+                print(log_line, end="")
+                logfile.write(log_line)
+                logfile.flush()
+            except Exception as e:
+                error_line = f"{time.strftime('%Y-%m-%d %H:%M:%S')} Error reading sensor: {e}\n"
+                print(error_line, end="")
+                logfile.write(error_line)
+                logfile.flush()
+            time.sleep(5)  # Vänta 5 sekunder innan nästa läsning
 
