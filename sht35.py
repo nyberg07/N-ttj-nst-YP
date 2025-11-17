@@ -4,6 +4,7 @@ import smbus2
 I2C_BUS = 2                 # /dev/i2c-2
 SHT3X_ADDRESS = 0x45        # Grove SHT35 address
 CMD_SINGLE_SHOT_HIGH = (0x24, 0x00)
+LOG_FILE = "/home/debian/sht35.log"
 
 def _crc8_sht(data: bytes) -> int:
     poly = 0x31
@@ -43,18 +44,19 @@ def read_sht35():
         }
 
 if __name__ == "__main__":
-    with open("/home/debian/sht35.log", "a") as logfile:
-        while True:
-            try:
-                data = read_sht35()
-                log_line = f"{time.strftime('%Y-%m-%d %H:%M:%S')} Temperature: {data['temperature']:.2f} °C, Humidity: {data['humidity']:.2f} %\n"
-                print(log_line, end="")
-                logfile.write(log_line)
-                logfile.flush()
-            except Exception as e:
-                error_line = f"{time.strftime('%Y-%m-%d %H:%M:%S')} Error reading sensor: {e}\n"
-                print(error_line, end="")
-                logfile.write(error_line)
-                logfile.flush()
-            time.sleep(5)  # Vänta 5 sekunder innan nästa läsning
+    while True:
+        try:
+            data = read_sht35()
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+            log_line = f"{timestamp} Temperature: {data['temperature']:.2f} °C, Humidity: {data['humidity']:.2f} %"
+            print(log_line)
+
+            # Spara till loggfil, lägg till (append)
+            with open(LOG_FILE, "a") as f:
+                f.write(log_line + "\n")
+
+        except Exception as e:
+            print(f"Error reading sensor: {e}")
+
+        time.sleep(5)  # Vänta 5 sekunder innan nästa läsning
 
