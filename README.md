@@ -38,3 +38,13 @@ sudo systemctl status sht35.service
 sudo journalctl -u sht35.service -f  
 
 Loggfilen (sht35.log) kommer att finnas i samma katalog som skriptet och innehåller tidsstämplade mätvärden.
+
+SHT35 Temperatursensor och Loggning
+
+Nytt Python-script sht35.py som läser temperatur och luftfuktighet från SHT35-sensorn och loggar mätvärdena kontinuerligt till fil /home/debian/sht35.log.
+
+Systemd-service sht35.service för att automatiskt starta och köra mätningen som en bakgrundsprocess vid uppstart.
+
+Loggfilen uppdateras med tidsstämplade temperatur- och fuktighetsvärden för senare analys.
+
+(Eventuell info om plotting-script om du har det.)
