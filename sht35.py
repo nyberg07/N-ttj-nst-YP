@@ -1,11 +1,18 @@
 import time
+import json
 import smbus2
+from datetime import datetime
+import mysql.connector
+from mysql.connector import Error
 
+# ========== SHT35 sensorinställningar ==========
 I2C_BUS = 2                 # /dev/i2c-2
 SHT3X_ADDRESS = 0x45        # Grove SHT35 address
 CMD_SINGLE_SHOT_HIGH = (0x24, 0x00)
-LOG_FILE = "/home/debian/sht35.log"
 
+DATA_FILE = "/home/debian/sht35_log.jsonl"   # NDJSON-fil
+
+# --- CRC-funktion ---
 def _crc8_sht(data: bytes) -> int:
     poly = 0x31
     crc = 0xFF
@@ -18,6 +25,7 @@ def _crc8_sht(data: bytes) -> int:
                 crc = (crc << 1) & 0xFF
     return crc
 
+# --- Läs sensor ---
 def read_sht35():
     with smbus2.SMBus(I2C_BUS) as bus:
         bus.write_i2c_block_data(SHT3X_ADDRESS, CMD_SINGLE_SHOT_HIGH[0], [CMD_SINGLE_SHOT_HIGH[1]])
@@ -43,20 +51,55 @@ def read_sht35():
             "humidity": humidity_rh
         }
 
-if __name__ == "__main__":
-    while True:
-        try:
-            data = read_sht35()
-            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-            log_line = f"{timestamp} Temperature: {data['temperature']:.2f} °C, Humidity: {data['humidity']:.2f} %"
-            print(log_line)
+# --- Logga till NDJSON-fil ---
+def log_record(record):
+    with open(DATA_FILE, "a") as f:
+        f.write(json.dumps(record) + "\n")
 
-            # Spara till loggfil, lägg till (append)
-            with open(LOG_FILE, "a") as f:
-                f.write(log_line + "\n")
+# --- Skriv data till MySQL-databas ---
+def insert_to_db(record):
+    try:
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='sht35user',
+            password='By8Hq2Ze',
+            database='sht35db'
+        )
+        if connection.is_connected():
+            cursor = connection.cursor()
+            sql = """
+                INSERT INTO readings (timestamp, temperature, humidity)
+                VALUES (%s, %s, %s)
+            """
+            data = (record["timestamp"], record["temperature"], record["humidity"])
+            cursor.execute(sql, data)
+            connection.commit()
+            cursor.close()
+    except Error as e:
+        print(f"Error connecting/inserting to DB: {e}")
+    finally:
+        if connection.is_connected():
+            connection.close()
 
-        except Exception as e:
-            print(f"Error reading sensor: {e}")
+# --- Huvudloop ---
+print("Logging SHT35 data every minute...")
 
-        time.sleep(5)  # Vänta 5 sekunder innan nästa läsning
+while True:
+    try:
+        reading = read_sht35()
+        record = {
+            "timestamp": datetime.now().isoformat(),
+            "temperature": reading["temperature"],
+            "humidity": reading["humidity"]
+        }
+
+        log_record(record)
+        insert_to_db(record)
+        print("Logged:", record)
+
+    except Exception as e:
+        print("Error:", e)
+
+    time.sleep(5)  # vänta 5 sekunder
+
 

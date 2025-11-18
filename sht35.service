@@ -1,9 +1,11 @@
 [Unit]
-Description=SHT35 Temperature/Humidity Logger
+Description=SHT35 Temperature and Humidity Logger
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 /home/debian/sht35.py
+User=debian
+WorkingDirectory=/home/debian
+ExecStart=/home/debian/sht35_venv/bin/python /home/debian/sht35.py
 Restart=always
 RestartSec=5
 StandardOutput=journal
@@ -11,5 +13,4 @@ StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
-
 
