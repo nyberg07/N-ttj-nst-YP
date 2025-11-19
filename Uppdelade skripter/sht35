@@ -1,0 +1,15 @@
+server {
+    listen 80;                      # Lyssnar på HTTP port 80
+    server_name 192.168.21.44;      # Serverns IP eller domännamn
+
+    location / {
+        # All trafik till root skickas vidare till din Flask-app som körs på localhost port 8000
+        proxy_pass http://127.0.0.1:8000;
+
+        # Dessa headers skickas med till backend för att behålla korrekt info om originalförfrågan
+        proxy_set_header Host $host;                     # Sätter Host-headern till originalvärdet
+        proxy_set_header X-Real-IP $remote_addr;         # Skickar klientens riktiga IP
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  # Lista med IP:n som proxyn gått igenom
+        proxy_set_header X-Forwarded-Proto $scheme;      # Protokoll (http eller https)
+    }
+}
