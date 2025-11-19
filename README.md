@@ -166,13 +166,13 @@ Så här startar du tjänsterna efter omstart av BeagleBone Green
 
 Systemd-tjänsten är konfigurerad att starta automatiskt vid boot (via sudo systemctl enable sht35.service), men om du vill manuellt starta eller kontrollera status på tjänsten efter en omstart kan du använda dessa kommandon:
 
-# Starta tjänsten
+Starta tjänsten
 sudo systemctl start sht35.service
 
-# Kontrollera status
+Kontrollera status
 sudo systemctl status sht35.service
 
-# Följ loggar i realtid
+Följ loggar i realtid
 sudo journalctl -u sht35.service -f
 
 För Flask-webbservern kan du antingen starta den manuellt varje gång med:
