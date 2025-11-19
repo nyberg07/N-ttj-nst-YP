@@ -1,0 +1,38 @@
+<!DOCTYPE html> <!-- Dokumenttyp deklaration för HTML5 -->
+<html lang="sv"> <!-- Språket är svenska -->
+<head>
+    <meta charset="UTF-8" /> <!-- Teckenkodning -->
+    <title>Temperatur och Luftfuktighet</title> <!-- Sidans titel i webbläsarfliken -->
+    <!-- Länka till extern CSS-fil för styling -->
+    <link rel="stylesheet" href="style.css" />
+    <!-- Länka till Chart.js-biblioteket från CDN för diagram -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Sensor Data</h1> <!-- Huvudrubrik på sidan -->
+
+    <table id="data-table"> <!-- Tabell för att visa mätdata -->
+        <thead> <!-- Tabellhuvud -->
+            <tr> <!-- Rad i tabellhuvudet -->
+                <th>Tidpunkt</th> <!-- Kolumnrubrik för tid -->
+                <th>Temperatur (°C)</th> <!-- Kolumnrubrik för temperatur -->
+                <th>Luftfuktighet (%)</th> <!-- Kolumnrubrik för luftfuktighet -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Här läggs data från PHP in dynamiskt via JavaScript -->
+        </tbody>
+    </table>
+
+    <div id="status">Laddar data...</div> <!-- Statusmeddelande under tabellen -->
+
+    <h2>Senaste 10 mätningarna - Temperatur och Luftfuktighet</h2> <!-- Underrubrik -->
+    <div id="chart-container"> <!-- Behållare för diagrammet -->
+        <canvas id="sensorChart"></canvas> <!-- Canvas-element för Chart.js-diagram -->
+    </div>
+
+    <!-- Länka till extern JavaScript-fil för funktionalitet -->
+    <script src="script.js"></script>
+</body>
+</html>
+

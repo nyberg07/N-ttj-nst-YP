@@ -1,0 +1,16 @@
+[Unit]
+Description=SHT35 Temperature and Humidity Logger   # Beskrivning av tjänsten
+After=network.target                                # Starta tjänsten efter nätverket är uppe
+
+[Service]
+User=debian                                         # Kör tjänsten som användaren "debian"
+WorkingDirectory=/home/debian                        # Arbetkatalog för tjänsten
+ExecStart=/home/debian/sht35_venv/bin/python /home/debian/sht35.py  # Kommando för att starta python-scriptet i virtuell miljö
+Restart=always                                      # Starta om tjänsten automatiskt vid krasch
+RestartSec=5                                        # Vänta 5 sekunder innan omstart
+StandardOutput=journal                              # Logga stdout till journal
+StandardError=journal                               # Logga stderr till journal
+
+[Install]
+WantedBy=multi-user.target                          # Starta tjänsten vid systemstart för multi-user runlevel
+

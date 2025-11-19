@@ -1,0 +1,64 @@
+body {
+    font-family: Arial, sans-serif; /* Typsnitt för hela sidan */
+    background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); /* Bakgrundsgradient */
+    color: #333; /* Standard textfärg */
+    margin: 0; /* Ta bort standardmarginal */
+    padding: 20px; /* Lägger till padding runt innehållet */
+}
+
+h1 {
+    text-align: center; /* Centrera texten */
+    margin-bottom: 10px; /* Marginal under rubriken */
+    color: #003366; /* Mörkblå färg */
+}
+
+h2 {
+    text-align: center; /* Centrera texten */
+    margin-top: 40px; /* Marginal ovanför rubriken */
+    color: #00509e; /* Blå färg */
+}
+
+table {
+    border-collapse: collapse; /* Slå ihop kanterna mellan celler */
+    width: 80%; /* Tabellbredd */
+    max-width: 800px; /* Maxbredd */
+    margin: 20px auto; /* Marginal ovan och under, centrera horisontellt */
+    background: #fff; /* Vit bakgrund */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Lätt skugga runt tabellen */
+    border-radius: 8px; /* Rundade hörn */
+    overflow: hidden; /* Dölj innehåll som sticker ut */
+}
+
+th, td {
+    border: 1px solid #888; /* Grå kantlinje runt cellerna */
+    padding: 12px 15px; /* Inre marginal i cellerna */
+    text-align: center; /* Centrera texten */
+    font-size: 1rem; /* Normal textstorlek */
+}
+
+th {
+    background-color: #00509e; /* Mörkblå bakgrund för rubriker */
+    color: white; /* Vit textfärg */
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f3f7ff; /* Ljusblå bakgrund för varannan rad */
+}
+
+#status {
+    text-align: center; /* Centrera texten */
+    margin-top: 10px; /* Marginal ovanför statusfältet */
+    font-style: italic; /* Kursiv stil */
+    color: #555; /* Mörkgrå textfärg */
+}
+
+#chart-container {
+    width: 90%; /* Bredd på diagrambehållaren */
+    max-width: 900px; /* Maxbredd */
+    margin: 30px auto 60px; /* Marginal ovanför, centrerad, marginal under */
+    background: white; /* Vit bakgrund */
+    padding: 20px; /* Inre marginal */
+    border-radius: 10px; /* Rundade hörn */
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1); /* Lätt skugga runt behållaren */
+}
+
