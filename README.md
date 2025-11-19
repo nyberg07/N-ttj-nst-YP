@@ -1,13 +1,18 @@
 # N-ttj-nst-YP
 
-Vad jag har gjort hittills
-
 Jag har byggt ett system som läser av temperatur och luftfuktighet från en SHT35-sensor via I2C på en BeagleBone Black och loggar data både till en fil och till en MySQL/MariaDB-databas. Sedan visar jag datan på en webbsida med hjälp av Flask.
 
+Börja med att logga in på begleboarden via ssh med: ssh debian@192.168.21.44
+Skriv lösenordet
+Uppdatera alla paket på systemet med: sudo apt update och sudo apt upgrade.
+
 Steg för steg – så här har jag fått allt att fungera
+
 1. Skapa en virtuell miljö och installera nödvändiga Python-paket
 
 För att hålla allt rent och organiserat skapade jag en Python virtuell miljö för projektet:
+
+```bash
 python3 -m venv sht35_venv
 source sht35_venv/bin/activate
 
@@ -20,7 +25,6 @@ Jag skrev ett Python-skript som läser temperatur och luftfuktighet från SHT35 
 
 För att testa körde jag:
 python3 sht35.py
-
 och verifierade att värdena skrivs ut i terminalen.
 
 3. Skapa och aktivera systemd-tjänst för automatisk start (sht35.service)
@@ -83,7 +87,10 @@ Jag skrev ett Flask-baserat webbskript som hämtar och visar de senaste mätvär
 Jag startade servern med:
 python3 sht35_web.py
 
-Sedan öppnade jag webbläsaren på http://<beaglebone-ip>:8000 för att se datan.
+Sedan öppnade jag webbläsaren på:
+http://192.168.21.44:8000
+
+för att se datan.
 
 7. Hantera portkonflikt
 
@@ -93,27 +100,9 @@ Jag kontrollerade vilken process som använde porten:
 sudo lsof -i :8000
 
 Och dödade den processen med:
-
 sudo kill -9 <PID>
 
 Efter det kunde jag starta Flask-servern utan problem.
-
-| Används till att:                 | Kommando/exempel:                                                               |
-| --------------------------------- | ------------------------------------------------------------------------------ |
-| Skapa virtuell miljö              | `python3 -m venv sht35_venv`                                                   |
-| Aktivera virtuell miljö           | `source sht35_venv/bin/activate`                                               |
-| Installera Python-paket           | `pip install smbus2 mysql-connector-python flask`                              |
-| Köra skript direkt                | `python3 sht35.py`                                                             |
-| Skapa systemd-tjänstfil           | Placera `sht35.service` i `/etc/systemd/system/`                               |
-| Ladda om systemd                  | `sudo systemctl daemon-reload`                                                 |
-| Aktivera och starta tjänst        | `sudo systemctl enable sht35.service` och `sudo systemctl start sht35.service` |
-| Kontrollera tjänststatus          | `sudo systemctl status sht35.service`                                          |
-| Visa tjänstloggar                 | `sudo journalctl -u sht35.service -f`                                          |
-| Installera MariaDB                | `sudo apt install mariadb-server`                                              |
-| Logga in i MariaDB                | `sudo mysql`                                                                   |
-| Skapa databas och tabell          | Se SQL-kommandon ovan                                                          |
-| Starta Flask-webbserver           | `python3 sht35_web.py`                                                         |
-| Kontrollera port och döda process | `sudo lsof -i :8000` och `sudo kill -9 <PID>`                                  |
 
 8. Skapa en Nginx-reverse proxy för Flask-applikationen
 
@@ -125,7 +114,10 @@ Denna site aktiverades genom en symbolisk länk i /etc/nginx/sites-enabled/.
 
 Efter konfigurationsändringen startades Nginx om för att ändringarna skulle börja gälla.
 
-Det gör att du nu kan nå Flask-applikationen via http://<beaglebone-ip>/ istället för att behöva ange port 8000.
+Det gör att du nu kan nå Flask-applikationen via:
+http://192.168.21.44/
+
+istället för att behöva ange port 8000.
 
 9. Bygga en frontend-tabell för visning av sensorvärden
 
@@ -143,30 +135,63 @@ Bekräftade att sidan laddas på port 80 och visar tabellen med data.
 
 Kontrollerade att Flask-applikationen fungerar som den ska bakom Nginx-reverse proxyn.
 
-Säkerställde att all data från SHT35 sensorn presenteras korrekt i tabellen på webbsidan.
+Säkerställde att all data från SHT35-sensorn presenteras korrekt i tabellen på webbsidan.
 
-Kort sammanfattning
-Åtgärd	Vad det innebär
-Nginx proxy till Flask	Gör Flask-applikationen tillgänglig via port 80
-Frontend HTML-tabell	Visar sensorvärden snyggt och läsbart i webbläsaren
-Data uppdateras vid omladdning	Ny data hämtas från servern varje gång sidan laddas
+Kort sammanfattning av kommandon
+Används till att:	Kommando/exempel:
+Skapa virtuell miljö	python3 -m venv sht35_venv
+Aktivera virtuell miljö	source sht35_venv/bin/activate
+Installera Python-paket	pip install smbus2 mysql-connector-python flask
+Köra skript direkt	python3 sht35.py
+Skapa systemd-tjänstfil	Placera sht35.service i /etc/systemd/system/
+Ladda om systemd	sudo systemctl daemon-reload
+Aktivera och starta tjänst	sudo systemctl enable sht35.service och sudo systemctl start sht35.service
+Kontrollera tjänststatus	sudo systemctl status sht35.service
+Visa tjänstloggar	sudo journalctl -u sht35.service -f
+Installera MariaDB	sudo apt install mariadb-server
+Logga in i MariaDB	sudo mysql
+Skapa databas och tabell	Se SQL-kommandon ovan
+Starta Flask-webbserver	python3 sht35_web.py
+Kontrollera port och döda process	sudo lsof -i :8000 och sudo kill -9 <PID>
 
-Efter att ha fått datan att visas på webbsidan fokuserade jag på att förbättra utseendet och användarupplevelsen. Jag implementerade en modern och responsiv design med hjälp av CSS direkt inbäddat i HTML-filen. Målet var att:
+Så här startar du tjänsterna efter omstart av BeagleBone Green
 
-Göra tabellen mer visuellt tilltalande med rundade hörn, skuggor och en behaglig färgpalett.
+Systemd-tjänsten är konfigurerad att starta automatiskt vid boot (via sudo systemctl enable sht35.service), men om du vill manuellt starta eller kontrollera status på tjänsten efter en omstart kan du använda dessa kommandon:
 
-Förbättra läsbarheten genom tydliga rubriker och centrerad text.
+# Starta tjänsten
+sudo systemctl start sht35.service
 
-Göra sidan responsiv så att den fungerar bra även på mobila enheter, där tabellen omformas till en mer läsvänlig kortvy.
+# Kontrollera status
+sudo systemctl status sht35.service
 
-Lägga till hover-effekter för att förbättra interaktiviteten när användaren för musen över tabellraderna.
+# Följ loggar i realtid
+sudo journalctl -u sht35.service -f
 
-JavaScript-koden för att hämta och visa data från servern är fortfarande kvar och körs automatiskt när sidan laddas, vilket gör att datan alltid är uppdaterad.
+För Flask-webbservern kan du antingen starta den manuellt varje gång med:
+source sht35_venv/bin/activate
+python3 sht35_web.py
 
-Denna förbättring gör det enklare att snabbt överblicka sensordatan och gör sidan mer användarvänlig oavsett skärmstorlek.
+Eller skapa en liknande systemd-tjänst för Flask-webbservern så att den också startar automatiskt vid boot. Här är ett exempel på en systemd-tjänstfil sht35_web.service:
 
-För att förbättra användarupplevelsen har jag lagt till funktionalitet som gör att sidan automatiskt hämtar och uppdaterar temperatur- och luftfuktighetsdata var 5:e sekund utan att behöva ladda om hela sidan manuellt.
+[Unit]
+Description=Flask Web Server for SHT35 Data
+After=network.target
 
-Detta är implementerat med JavaScript där setInterval används för att kalla på fetchData-funktionen kontinuerligt. Funktionen hämtar ny data från backend via en API-anrop (get_data.php) och uppdaterar tabellen i realtid.
+[Service]
+User=debian
+WorkingDirectory=/home/debian/
+ExecStart=/home/debian/sht35_venv/bin/python3 /home/debian/sht35_web.py
+Restart=always
+RestartSec=5
 
-Genom att använda denna lösning får användaren alltid aktuell information utan att behöva klicka eller refresha sidan, vilket är viktigt för övervakning av sensordata i realtid.
+[Install]
+WantedBy=multi-user.target
+
+Spara denna i /etc/systemd/system/sht35_web.service och aktivera/starta den:
+
+sudo systemctl daemon-reload
+sudo systemctl enable sht35_web.service
+sudo systemctl start sht35_web.service
+
+Som mösenord till Beagleboarden och alla andra tjänster använde jag: By8Hq2Ze
+Användarnamnet till MariaDB är: root
