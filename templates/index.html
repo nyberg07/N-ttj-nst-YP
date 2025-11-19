@@ -2,43 +2,65 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8" />
-    <title>SHT35 Temperatur och Luftfuktighet</title>
+    <title>Temperatur och Luftfuktighet</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .data { margin-top: 20px; }
+        table {
+            border-collapse: collapse;
+            width: 60%;
+            margin: 20px auto;
+        }
+        th, td {
+            border: 1px solid #888;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #eee;
+        }
     </style>
 </head>
 <body>
-    <h1>Hej, SHT35 data här!</h1>
-    <div class="data">
-        <p>Senaste mätningen:</p>
-        <p><strong>Tidpunkt:</strong> <span id="timestamp">Laddar...</span></p>
-        <p><strong>Temperatur:</strong> <span id="temperature">Laddar...</span> °C</p>
-        <p><strong>Luftfuktighet:</strong> <span id="humidity">Laddar...</span> %</p>
-    </div>
+    <h1 style="text-align:center;">Sensor Data</h1>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>Tidpunkt</th>
+                <th>Temperatur (°C)</th>
+                <th>Luftfuktighet (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data från PHP kommer här -->
+        </tbody>
+    </table>
 
     <script>
         async function fetchData() {
             try {
-                const response = await fetch('/latest_reading');
+                const response = await fetch('/get_data.php');
                 const data = await response.json();
 
-                if (data.timestamp) {
-                    document.getElementById('timestamp').textContent = data.timestamp;
-                    document.getElementById('temperature').textContent = data.temperature.toFixed(2);
-                    document.getElementById('humidity').textContent = data.humidity.toFixed(2);
-                } else {
-                    document.getElementById('timestamp').textContent = "Ingen data";
-                    document.getElementById('temperature').textContent = "-";
-                    document.getElementById('humidity').textContent = "-";
-                }
+                const tbody = document.querySelector('#data-table tbody');
+                tbody.innerHTML = ''; // Rensa tidigare data
+
+                data.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item.timestamp}</td>
+                        <td>${parseFloat(item.temperature).toFixed(2)}</td>
+                        <td>${parseFloat(item.humidity).toFixed(2)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
             } catch (error) {
-                console.error("Fel vid hämtning av data:", error);
+                console.error('Kunde inte hämta data:', error);
             }
         }
 
         fetchData();
-        setInterval(fetchData, 5000);
+
+        // Om du vill kan du uppdatera datan var 30:e sekund:
+        // setInterval(fetchData, 30000);
     </script>
 </body>
 </html>
