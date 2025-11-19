@@ -17,7 +17,7 @@ BeagleBone Green har flera I2C-bussar som är inaktiva som standard. Jag aktiver
 
 Rättigheter och behörigheter för Nginx och Flask
 
-När vi konfigurerade Nginx som en reverse proxy för Flask-applikationen är det viktigt att se till att rätt användare och rättigheter är korrekt inställda för att undvika åtkomstproblem.
+När jag konfigurerade Nginx som en reverse proxy för Flask-applikationen är det viktigt att se till att rätt användare och rättigheter är korrekt inställda för att undvika åtkomstproblem.
 
 Nginx körs vanligtvis som användaren www-data (på Debian/Ubuntu-system).
 
