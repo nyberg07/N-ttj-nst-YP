@@ -5,100 +5,95 @@
     <title>Temperatur och Luftfuktighet</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #dce35b, #45b649);
-            margin: 0;
-            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
             color: #333;
-        }
-        header {
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            padding: 20px 0;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        header h1 {
             margin: 0;
-            font-size: 2.5rem;
-            letter-spacing: 2px;
+            padding: 20px;
         }
-        main {
-            max-width: 900px;
-            margin: 40px auto;
-            background-color: rgba(255,255,255,0.95);
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #003366;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 40px;
+            color: #00509e;
         }
         table {
             border-collapse: collapse;
-            width: 100%;
-            margin: 20px 0;
-            font-size: 1.1rem;
+            width: 80%;
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
         }
         th, td {
             border: 1px solid #888;
             padding: 12px 15px;
             text-align: center;
+            font-size: 1rem;
         }
         th {
-            background-color: #34495e;
-            color: #ecf0f1;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            background-color: #00509e;
+            color: white;
         }
         tbody tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: #f3f7ff;
         }
-        tbody tr:hover {
-            background-color: #d1f0d1;
-            transition: background-color 0.3s ease;
-        }
-        .temp {
-            color: #e74c3c; /* röd för temperatur */
-            font-weight: bold;
-        }
-        .humidity {
-            color: #2980b9; /* blå för luftfuktighet */
-            font-weight: bold;
-        }
-        footer {
+        #status {
             text-align: center;
-            margin: 40px 0 20px 0;
-            color: #555;
+            margin-top: 10px;
             font-style: italic;
+            color: #555;
+        }
+        #chart-container {
+            width: 90%;
+            max-width: 900px;
+            margin: 30px auto 60px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Temperatur och Luftfuktighet</h1>
-    </header>
-    <main>
-        <table id="data-table">
-            <thead>
-                <tr>
-                    <th>Tidpunkt</th>
-                    <th>Temperatur (°C)</th>
-                    <th>Luftfuktighet (%)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Data från PHP kommer här -->
-            </tbody>
-        </table>
-    </main>
-    <footer>
-        Uppdateras automatiskt var 5:e sekund
-    </footer>
+    <h1>Sensor Data</h1>
+
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>Tidpunkt</th>
+                <th>Temperatur (°C)</th>
+                <th>Luftfuktighet (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data från PHP kommer här -->
+        </tbody>
+    </table>
+
+    <div id="status">Laddar data...</div>
+
+    <h2>Senaste 10 mätningarna - Temperatur och Luftfuktighet</h2>
+    <div id="chart-container">
+        <canvas id="sensorChart"></canvas>
+    </div>
 
     <script>
+        let chart;
+
         async function fetchData() {
             try {
                 const response = await fetch('/get_data.php');
                 const data = await response.json();
 
+                // Uppdatera tabell
                 const tbody = document.querySelector('#data-table tbody');
                 tbody.innerHTML = ''; // Rensa tidigare data
 
@@ -106,20 +101,98 @@
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${item.timestamp}</td>
-                        <td class="temp">${parseFloat(item.temperature).toFixed(2)}</td>
-                        <td class="humidity">${parseFloat(item.humidity).toFixed(2)}</td>
+                        <td>${parseFloat(item.temperature).toFixed(2)}</td>
+                        <td>${parseFloat(item.humidity).toFixed(2)}</td>
                     `;
                     tbody.appendChild(tr);
                 });
+
+                // Uppdatera status
+                document.getElementById('status').textContent = `Senaste uppdateringen: ${new Date().toLocaleTimeString()}`;
+
+                // För diagrammet: ta de senaste 10 mätningarna
+                const latestTen = data.slice(0, 10).reverse(); // Vänd ordningen så äldsta först
+
+                const labels = latestTen.map(item => item.timestamp);
+                const temperatures = latestTen.map(item => parseFloat(item.temperature));
+                const humidities = latestTen.map(item => parseFloat(item.humidity));
+
+                if (!chart) {
+                    // Skapa diagrammet första gången
+                    const ctx = document.getElementById('sensorChart').getContext('2d');
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: 'Temperatur (°C)',
+                                    data: temperatures,
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    fill: false,
+                                    tension: 0.3,
+                                    yAxisID: 'y1',
+                                },
+                                {
+                                    label: 'Luftfuktighet (%)',
+                                    data: humidities,
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                    fill: false,
+                                    tension: 0.3,
+                                    yAxisID: 'y2',
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            interaction: {
+                                mode: 'index',
+                                intersect: false,
+                            },
+                            stacked: false,
+                            scales: {
+                                y1: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'left',
+                                    title: {
+                                        display: true,
+                                        text: 'Temperatur (°C)'
+                                    }
+                                },
+                                y2: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'right',
+                                    grid: {
+                                        drawOnChartArea: false,
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Luftfuktighet (%)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    // Uppdatera data i diagrammet
+                    chart.data.labels = labels;
+                    chart.data.datasets[0].data = temperatures;
+                    chart.data.datasets[1].data = humidities;
+                    chart.update();
+                }
             } catch (error) {
                 console.error('Kunde inte hämta data:', error);
+                document.getElementById('status').textContent = 'Fel vid hämtning av data.';
             }
         }
 
-        // Initial hämtning
         fetchData();
 
-        // Uppdatera data var 5:e sekund (5000 ms)
+        // Uppdatera data var 5:e sekund
         setInterval(fetchData, 5000);
     </script>
 </body>
