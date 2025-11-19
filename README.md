@@ -1,10 +1,19 @@
 # N-ttj-nst-YP
 
-Jag har byggt ett system som läser av temperatur och luftfuktighet från en SHT35-sensor via I2C på en BeagleBone Black och loggar data både till en fil och till en MySQL/MariaDB-databas. Sedan visar jag datan på en webbsida med hjälp av Flask.
+Jag har byggt ett system som läser av temperatur och luftfuktighet från en SHT35-sensor via I2C på en BeagleBone Green och loggar data både till en fil och till en MySQL/MariaDB-databas. Sedan visar jag datan på en webbsida med hjälp av Flask.
 
 Börja med att logga in på begleboarden via ssh med: ssh debian@192.168.7.2
 Skriv lösenordet
 Uppdatera alla paket på systemet med: sudo apt update och sudo apt upgrade.
+
+Jag föjlde de steg som fanns i Janis REPO
+
+Konfiguration av I2C på BeagleBone Green
+
+För att kunna läsa data från SHT35-sensorn via I2C var jag tvungnen att aktivera och konfigurera I2C-gränssnittet på BeagleBone Green:
+
+Aktivera I2C-bussarna:
+BeagleBone Green har flera I2C-bussar som är inaktiva som standard. Jag aktiverade I2C-2 (eller den buss som sensorn var kopplad till) genom att använda config-pin-verktyget:
 
 Steg för steg – så här har jag fått allt att fungera
 
@@ -12,7 +21,6 @@ Steg för steg – så här har jag fått allt att fungera
 
 För att hålla allt rent och organiserat skapade jag en Python virtuell miljö för projektet:
 
-```bash
 python3 -m venv sht35_venv
 source sht35_venv/bin/activate
 
@@ -108,7 +116,7 @@ Efter det kunde jag starta Flask-servern utan problem.
 
 För att göra Flask-webbservern tillgänglig via standard HTTP-porten 80 (så att man slipper skriva portnummer i webbläsaren) skapade vi en Nginx-konfiguration som proxyar all trafik från port 80 till Flask-applikationen som körs på port 8000.
 
-Vi skapade en Nginx site-fil /etc/nginx/sites-available/sht35 som pekar om all trafik till http://127.0.0.1:8000.
+Jag skapade en Nginx site-fil /etc/nginx/sites-available/sht35 som pekar om all trafik till http://127.0.0.1:8000.
 
 Denna site aktiverades genom en symbolisk länk i /etc/nginx/sites-enabled/.
 
@@ -121,7 +129,7 @@ istället för att behöva ange port 8000.
 
 9. Bygga en frontend-tabell för visning av sensorvärden
 
-Vi skapade en tabell i HTML (placerad i index.html) som hämtar temperatur- och fuktighetsdata i JSON-format från Flask-servern.
+Jag skapade en tabell i HTML (placerad i index.html) som hämtar temperatur- och fuktighetsdata i JSON-format från Flask-servern.
 
 Data visas i tabellen när sidan laddas om.
 
