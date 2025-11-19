@@ -1,0 +1,29 @@
+server {
+    listen 80;                         # Nginx lyssnar på port 80 (HTTP)
+    server_name 192.168.21.44;         # Servernamn eller IP som denna vhost svarar på
+
+    root /var/www/html;                # Sökväg där webbplatsens filer ligger
+    index index.php index.html index.htm;  # Fil som laddas som startsida
+
+    location / {
+        # Försök att leverera filen som begärts.
+        # Om filen inte finns, returnera 404.
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ \.php$ {
+        # Inkluderar standard PHP-inställningar:
+        # - sätter rätt header-variabler
+        # - hanterar PATH_INFO osv.
+        include snippets/fastcgi-php.conf;
+
+        # Skickar PHP-förfrågningar till PHP-FPM via sock-filen
+        fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+    }
+
+    location ~ /\.ht {
+        # Hindrar åtkomst till .htaccess och liknande filer
+        # (Apache-specifika, ska inte vara publika)
+        deny all;
+    }
+}
