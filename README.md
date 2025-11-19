@@ -194,4 +194,4 @@ sudo systemctl enable sht35_web.service
 sudo systemctl start sht35_web.service
 
 Som mösenord till Beagleboarden och alla andra tjänster använde jag: By8Hq2Ze
-Användarnamnet till MariaDB är: root
+Användarnamnet till MariaDB är: root och sht35user
