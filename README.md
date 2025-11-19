@@ -114,3 +114,39 @@ Efter det kunde jag starta Flask-servern utan problem.
 | Skapa databas och tabell          | Se SQL-kommandon ovan                                                          |
 | Starta Flask-webbserver           | `python3 sht35_web.py`                                                         |
 | Kontrollera port och döda process | `sudo lsof -i :8000` och `sudo kill -9 <PID>`                                  |
+
+8. Skapa en Nginx-reverse proxy för Flask-applikationen
+
+För att göra Flask-webbservern tillgänglig via standard HTTP-porten 80 (så att man slipper skriva portnummer i webbläsaren) skapade vi en Nginx-konfiguration som proxyar all trafik från port 80 till Flask-applikationen som körs på port 8000.
+
+Vi skapade en Nginx site-fil /etc/nginx/sites-available/sht35 som pekar om all trafik till http://127.0.0.1:8000.
+
+Denna site aktiverades genom en symbolisk länk i /etc/nginx/sites-enabled/.
+
+Efter konfigurationsändringen startades Nginx om för att ändringarna skulle börja gälla.
+
+Det gör att du nu kan nå Flask-applikationen via http://<beaglebone-ip>/ istället för att behöva ange port 8000.
+
+9. Bygga en frontend-tabell för visning av sensorvärden
+
+Vi skapade en tabell i HTML (placerad i index.html) som hämtar temperatur- och fuktighetsdata i JSON-format från Flask-servern.
+
+Data visas i tabellen när sidan laddas om.
+
+Tabellens rader byggs dynamiskt med JavaScript som parsar JSON-data och fyller tabellen med aktuell mätdata från sensorerna.
+
+Det här gör att användaren enkelt kan se mätvärdena direkt på webbsidan utan att behöva läsa rå JSON.
+
+10. Test och verifiering
+
+Bekräftade att sidan laddas på port 80 och visar tabellen med data.
+
+Kontrollerade att Flask-applikationen fungerar som den ska bakom Nginx-reverse proxyn.
+
+Säkerställde att all data från SHT35 sensorn presenteras korrekt i tabellen på webbsidan.
+
+Kort sammanfattning
+Åtgärd	Vad det innebär
+Nginx proxy till Flask	Gör Flask-applikationen tillgänglig via port 80
+Frontend HTML-tabell	Visar sensorvärden snyggt och läsbart i webbläsaren
+Data uppdateras vid omladdning	Ny data hämtas från servern varje gång sidan laddas
