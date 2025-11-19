@@ -150,3 +150,17 @@ Kort sammanfattning
 Nginx proxy till Flask	Gör Flask-applikationen tillgänglig via port 80
 Frontend HTML-tabell	Visar sensorvärden snyggt och läsbart i webbläsaren
 Data uppdateras vid omladdning	Ny data hämtas från servern varje gång sidan laddas
+
+Efter att ha fått datan att visas på webbsidan fokuserade jag på att förbättra utseendet och användarupplevelsen. Jag implementerade en modern och responsiv design med hjälp av CSS direkt inbäddat i HTML-filen. Målet var att:
+
+Göra tabellen mer visuellt tilltalande med rundade hörn, skuggor och en behaglig färgpalett.
+
+Förbättra läsbarheten genom tydliga rubriker och centrerad text.
+
+Göra sidan responsiv så att den fungerar bra även på mobila enheter, där tabellen omformas till en mer läsvänlig kortvy.
+
+Lägga till hover-effekter för att förbättra interaktiviteten när användaren för musen över tabellraderna.
+
+JavaScript-koden för att hämta och visa data från servern är fortfarande kvar och körs automatiskt när sidan laddas, vilket gör att datan alltid är uppdaterad.
+
+Denna förbättring gör det enklare att snabbt överblicka sensordatan och gör sidan mer användarvänlig oavsett skärmstorlek.
