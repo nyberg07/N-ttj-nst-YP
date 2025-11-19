@@ -164,3 +164,9 @@ Lägga till hover-effekter för att förbättra interaktiviteten när användare
 JavaScript-koden för att hämta och visa data från servern är fortfarande kvar och körs automatiskt när sidan laddas, vilket gör att datan alltid är uppdaterad.
 
 Denna förbättring gör det enklare att snabbt överblicka sensordatan och gör sidan mer användarvänlig oavsett skärmstorlek.
+
+För att förbättra användarupplevelsen har jag lagt till funktionalitet som gör att sidan automatiskt hämtar och uppdaterar temperatur- och luftfuktighetsdata var 5:e sekund utan att behöva ladda om hela sidan manuellt.
+
+Detta är implementerat med JavaScript där setInterval används för att kalla på fetchData-funktionen kontinuerligt. Funktionen hämtar ny data från backend via en API-anrop (get_data.php) och uppdaterar tabellen i realtid.
+
+Genom att använda denna lösning får användaren alltid aktuell information utan att behöva klicka eller refresha sidan, vilket är viktigt för övervakning av sensordata i realtid.
