@@ -221,5 +221,95 @@ sudo systemctl daemon-reload
 sudo systemctl enable sht35_web.service
 sudo systemctl start sht35_web.service
 
+Start, Stopp och Felsökning
+Starta och stoppa tjänster
+Systemd-tjänsten för SHT35-sensoravläsning
+
+Starta tjänsten:
+sudo systemctl start sht35.service
+Aktivera automatisk start vid boot:
+sudo systemctl enable sht35.service
+Inaktivera automatisk start:
+sudo systemctl disable sht35.service
+Kontrollera status:
+sudo systemctl status sht35.service
+Visa realtidsloggar:
+sudo journalctl -u sht35.service -f
+Flask-webbservern
+Starta manuellt:
+source sht35_venv/bin/activate
+python3 sht35_web.py
+Flask körs vanligtvis på port 8000. Om porten redan används kan du hitta och stoppa processen:
+sudo lsof -i :8000
+sudo kill -9 <PID>
+Vanliga problem och felsökning
+I2C fungerar inte / sensorn läser inte av data
+
+Kontrollera att I2C är aktiverat i systemets inställningar.
+
+Se till att rätt drivrutiner är laddade och att användaren har rättigheter att använda I2C-bussen:
+ls /dev/i2c-*
+Kör i2cdetect -y 1 (eller relevant bussnummer) för att se om sensorn syns.
+
+Om sensorn inte svarar, kontrollera kopplingar och spänningsnivåer.
+
+Port 8000 är upptagen (Flask)
+
+Kontrollera vilken process som använder porten:
+sudo lsof -i :8000
+
+Döda processen:
+sudo kill -9 <PID>
+
+Starta sedan Flask igen.
+
+Problem med MariaDB-anslutning
+
+Kontrollera att MariaDB-tjänsten körs:
+sudo systemctl status mariadb
+
+Se till att användarnamn och lösenord i Python-skriptet stämmer överens med databaskonfigurationen.
+
+Testa att logga in i MariaDB manuellt:
+sudo mysql -u sht35user -p
+
+Nginx ger 403 Forbidden eller åtkomstproblem
+
+Kontrollera att Nginx har rätt att läsa Flask-projektets filer och att användaren www-data (eller motsvarande) har tillgång.
+
+Kontrollera fil- och mappbehörigheter för projektkatalogen.
+
+Kontrollera Nginx-konfigurationen för korrekt proxy-inställning.
+
+Hantera "502 Bad Gateway"-fel i Nginx
+
+Om du får en 502 Bad Gateway när du försöker nå Flask-applikationen via Nginx, kan det bero på att Flask-servern inte körs eller att Nginx inte kan nå Flask på den port den lyssnar på (vanligtvis port 8000).
+
+Så här felsöker och åtgärdar du:
+
+Kontrollera att Flask-servern körs:
+ps aux | grep python3
+
+Om Flask-processen inte är igång, starta den:
+source sht35_venv/bin/activate
+python3 sht35_web.py
+
+Kontrollera att Flask lyssnar på rätt port (standard 8000):
+sudo lsof -i :8000
+
+Om porten är upptagen av en annan process, stoppa den processen.
+
+Verifiera Nginx-konfigurationen:
+
+Kontrollera att proxy_pass i Nginx-konfigurationsfilen pekar på http://127.0.0.1:8000.
+
+Om Flask lyssnar på en annan port eller IP-adress, uppdatera Nginx-konfigurationen.
+
+Starta om Nginx:
+sudo systemctl restart nginx
+
+Kontrollera Nginx-loggar för detaljer:
+sudo tail -f /var/log/nginx/error.log
+
 Som mösenord till Beagleboarden och alla andra tjänster använde jag: By8Hq2Ze
 Användarnamnet till MariaDB är: root och sht35user
