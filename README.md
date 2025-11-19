@@ -2,7 +2,7 @@
 
 Jag har byggt ett system som läser av temperatur och luftfuktighet från en SHT35-sensor via I2C på en BeagleBone Black och loggar data både till en fil och till en MySQL/MariaDB-databas. Sedan visar jag datan på en webbsida med hjälp av Flask.
 
-Börja med att logga in på begleboarden via ssh med: ssh debian@192.168.21.44
+Börja med att logga in på begleboarden via ssh med: ssh debian@192.168.7.2
 Skriv lösenordet
 Uppdatera alla paket på systemet med: sudo apt update och sudo apt upgrade.
 
