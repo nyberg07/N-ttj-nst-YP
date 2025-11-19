@@ -15,7 +15,27 @@ För att kunna läsa data från SHT35-sensorn via I2C var jag tvungnen att aktiv
 Aktivera I2C-bussarna:
 BeagleBone Green har flera I2C-bussar som är inaktiva som standard. Jag aktiverade I2C-2 (eller den buss som sensorn var kopplad till) genom att använda config-pin-verktyget:
 
-Steg för steg – så här har jag fått allt att fungera
+Rättigheter och behörigheter för Nginx och Flask
+
+När vi konfigurerade Nginx som en reverse proxy för Flask-applikationen är det viktigt att se till att rätt användare och rättigheter är korrekt inställda för att undvika åtkomstproblem.
+
+Nginx körs vanligtvis som användaren www-data (på Debian/Ubuntu-system).
+
+Flask-applikationen körs normalt som en vanlig användare (t.ex. debian eller root under utveckling).
+
+För att Nginx ska kunna proxyförfrågningar till Flask-servern (som körs på localhost port 8000) behövs inga speciella filrättigheter eftersom kommunikationen sker via nätverksport.
+
+Om Flask-appen läser eller skriver filer (t.ex. loggfiler), måste dessa filer ha läs- och/eller skrivbehörigheter för användaren som kör Flask.
+
+Om Nginx ska servera statiska filer direkt (som HTML, CSS, JavaScript), måste dessa filer ha läsrättigheter för www-data.
+
+Om det uppstår problem med åtkomst kan du kontrollera och justera ägarskap och behörigheter med kommandon som:
+sudo chown -R www-data:www-data /var/www/html/  # exempel för statiska filer
+sudo chmod -R 755 /var/www/html/
+
+I miit projekt fungerar Flask-servern via port 8000 och Nginx proxar bara trafiken vidare, så inga ytterligare rättigheter behövs mellan Nginx och Flask utöver att Flask-servern körs och lyssnar på rätt port.
+
+Genom att säkerställa dessa rättigheter fungerar Nginx och Flask smidigt tillsammans utan åtkomstproblem.
 
 1. Skapa en virtuell miljö och installera nödvändiga Python-paket
 
